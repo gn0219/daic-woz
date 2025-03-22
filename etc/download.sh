@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Base URL where the files are hosted
-BASE_URL="https://dcapswoz.ict.usc.edu/wwwdaicwoz/"
+BASE_URL="download_url" # Replace with the actual URL
 
 # Directory to save downloaded files
 DOWNLOAD_DIR="./downloads"

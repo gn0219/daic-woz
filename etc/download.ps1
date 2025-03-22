@@ -1,4 +1,4 @@
-$BaseUrl = "https://dcapswoz.ict.usc.edu/wwwdaicwoz/"
+$BaseUrl = "download_url" # Replace with the actual URL
 $DownloadDir = ".\downloads"
 
 New-Item -ItemType Directory -Force -Path $DownloadDir
