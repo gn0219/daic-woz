@@ -1,0 +1,11 @@
+downloads/
+unzipped_files/
+wav_files/
+transcript_files/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+.env
+.DS_Store
+Thumbs.db
