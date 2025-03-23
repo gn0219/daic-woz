@@ -6,8 +6,6 @@ git clone https://github.com/your_username/daic-woz.git
 cd daic-woz
 ```
 
----
-
 ## Create a virtual environment
 
 Make sure Python is installed. If not, download it from the [official Python website](https://www.python.org/).
@@ -30,18 +28,14 @@ Activate the virtual environment:
   source .venv/bin/activate
   ```
 
----
-
 ## Install required packages
 
 ```bash
 pip install -r requirements.txt
 ```
-
 ---
 
 ## Download the DAIC-WOZ dataset
----
 
 ### Option 1: Manual download
 
@@ -49,8 +43,6 @@ pip install -r requirements.txt
 2. Complete the EULA form and obtain the download link.
 2. Download the `.zip` files manually.
 3. Move all downloaded `.zip` files into the `downloads/` folder.
-
----
 
 ### Option 2: Download full dataset with scripts
 
@@ -83,8 +75,6 @@ python unzip_files.py
 - Zip files in `downloads/` will be extracted to `unzipped_files/`.
 - All `.wav` files will be moved to `wav_files/`.
 - All transcript files (`_TRANSCRIPT.csv`) will be moved to `transcript_files/`.
-
----
 
 ## Project folder structure (after setup)
 
