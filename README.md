@@ -2,7 +2,7 @@
 ## Clone this repository
 
 ```bash
-git clone https://github.com/your_username/daic-woz.git
+git clone https://github.com/gn0219/daic-woz.git
 cd daic-woz
 ```
 
