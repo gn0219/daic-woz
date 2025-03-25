@@ -16,11 +16,15 @@ def unzip_files(zip_dir, extract_dir):
     for file in tqdm(os.listdir(zip_dir)):
         if file.endswith(".zip"):
             zip_path = os.path.join(zip_dir, file)
-            try:
-                with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                    zip_ref.extractall(extract_dir)
-            except:
-                print(f"Failed: {file}")
+            extract_path = os.path.join(extract_dir, os.path.splitext(file)[0])
+            if not os.path.exists(extract_path):
+                try:
+                    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                        zip_ref.extractall(extract_path)
+                except:
+                    print(f"Failed: {file}")
+            else:
+                print(f"Skipped: {file} (already exists)")
 
 def move_files(source_dir, destination_dir, file_extension):
     """
