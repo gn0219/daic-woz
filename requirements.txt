@@ -13,6 +13,7 @@ plotly==5.20.0
 librosa==0.10.1
 soundfile==0.12.1
 soxr==0.3.7
+opensmile
 
 # TDA
 giotto-tda==0.6.1

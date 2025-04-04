@@ -1,0 +1,13 @@
+Split
+Participant_ID
+Gender
+PHQ8_Binary
+PHQ8_Score
+Num_Utterances_Ellie
+Num_Utterances_Participant
+Total_Duration_Ellie
+Total_Duration_Participant
+Avg_Utterance_Duration_Ellie
+Avg_Utterance_Duration_Participant
+Num_Turns
+wav_path
