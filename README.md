@@ -1,3 +1,5 @@
+<details>
+<summary> Setup (click to expand)</summary>
 # Setup
 ## Clone this repository
 
@@ -95,6 +97,7 @@ daic-woz/
     ├── download.sh          # For Mac/Linux
     └── download.ps1         # For Windows
 ```
+</details> ```
 
 # Analysis
 ## 0. extract_features.ipynb
