@@ -8,6 +8,7 @@ scikit-learn==1.3.2
 matplotlib==3.8.3
 seaborn==0.13.2
 plotly==5.20.0
+SciencePlots==2.1.1
 
 # Audio
 librosa==0.10.1

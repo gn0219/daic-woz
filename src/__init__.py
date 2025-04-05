@@ -19,3 +19,7 @@ from .visualize_audio import (
     load_audio,
     plot_audio
 )
+
+from .visualize_results import (
+    plot_result,
+)

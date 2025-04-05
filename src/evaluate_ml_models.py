@@ -97,7 +97,7 @@ class MLPipeline:
             results.append({
                 'Model': 'Baseline (Majority Voting)',
                 'Accuracy': accuracy_score(y_eval, y_pred_dummy),
-                'F1_macro': f1_score(y_eval, y_pred_dummy, average='macro'),
+                'F1(macro)': f1_score(y_eval, y_pred_dummy, average='macro'),
                 'AUROC': auroc_dummy
             })
 
@@ -119,7 +119,7 @@ class MLPipeline:
             results.append({
                 'Model': model_name,
                 'Accuracy': accuracy_score(y_eval, y_pred),
-                'F1_macro': f1_score(y_eval, y_pred, average='macro'),
+                'F1(macro)': f1_score(y_eval, y_pred, average='macro'),
                 'AUROC': auroc
             })
 

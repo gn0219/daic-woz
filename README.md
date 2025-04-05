@@ -155,11 +155,13 @@ daic-woz/
 │   ├── extract_features.py         # Feature extraction logic
 │   ├── evaluate_ml_models.py       # ML model pipeline
 │   ├── visualize_features.py       # Feature-level plots
-│   └── visualize_audio.py          # Audio waveform / spectrogram visualization
+│   ├── visualize_audio.py          # Audio waveform / spectrogram visualization
+│   └── visualize_results.py        # Performance visualization (TODO: add confusion matrix visualization)
 │
 ├── 0. extract_features.ipynb       # Step 0 - Extract features from audio/transcripts
 ├── 1. eda.ipynb                    # Step 1 - Exploratory Data Analysis
 ├── 2. evaluate_basic_models.ipynb  # Step 2 - Classical ML model evaluation
+├── 3. topological_features.ipynb   # Step 3 - Topological Data Analysis
 │
 ├── README.md                       
 ├── requirements.txt               
