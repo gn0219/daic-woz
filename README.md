@@ -98,7 +98,7 @@ daic-woz/
     ├── download.sh          # For Mac/Linux
     └── download.ps1         # For Windows
 ```
-</details> ```
+</details>
 
 # Analysis
 ## 0. extract_features.ipynb
