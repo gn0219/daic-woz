@@ -1,5 +1,6 @@
 <details>
 <summary> Setup (click to expand)</summary>
+
 # Setup
 ## Clone this repository
 
