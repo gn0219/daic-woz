@@ -86,8 +86,79 @@ daic-woz/
 ├── wav_files/               # All .wav audio files
 ├── transcript_files/        # Transcript CSV files
 ├── unzip_files.py           # Unzipping and file-moving script
+├── src/                     # Source code modules
+│   ├── ...
+│   └── unzip_files.py 
+├── ...
 ├── requirements.txt         # Python dependencies
 └── etc/
     ├── download.sh          # For Mac/Linux
     └── download.ps1         # For Windows
+```
+
+# Analysis
+## 0. extract_features.ipynb
+After this process, we have `info_df.csv`, `utterance_features.csv`, and `smile_features.csv`.
+- Done
+  - Extract utterance related features from transcription files
+  - Extract openSMILE features from raw wav files
+  - `src/extract_features.py`
+- TODO: Extract openSMILE features after silence removal
+
+## 1. eda.ipynb
+- Done
+  - Visualize label information
+  - Modularize visualization code `src/visualize_features.py`
+    - histogram, numeric(boxplot or violinplot)
+  - Visualize audio file `src/visualize_audio.py`
+    - waveform, log spectrogram
+
+## 2. evaluate_basic_models.ipynb
+- Done
+  - Implement code `src/evaluate_ml_models.py` by only using `train` and `test` (not `dev`)
+    - Evaluate 7 models (including majority voting as a baseline model)
+      -  Baseline, SVM, KNN, RF, LR, GB, XGB
+    - Experiment with three different settings (smile features on raw data, utterance features, and merged version of them)
+    - Perform two differnt feature selection methods by setting `use_feature_selection=True`
+      - `selection_method='kbest'` or `selection_method='model'`
+
+## 3. topological_features.ipynb
+- Done (Seunghyun)
+  - Initial visualization
+- TODO: Expand to all UID (Gyuna)
+
+## TODO: DL models
+
+## Project folder structure (after Analysis)
+
+```plaintext
+daic-woz/
+│
+├── data/                           # CSV files (preprocessed / feature-extracted)
+│   ├── df.csv
+│   ├── info_df.csv
+│   ├── smile_features.csv
+│   ├── utterance_features.csv
+│
+├── downloads/                      # Raw .zip files (not used during analysis)
+├── unzipped_files/                 # Extracted zip contents (not used)
+├── wav_files/                      # Raw audio files (.wav) (used during feature extraction)
+├── transcript_files/               # Transcription files (_TRANSCRIPT.csv) (used during feature extraction)
+│
+├── src/                            # Source code modules
+│   ├── __init__.py
+│   ├── unzip_files.py              # Unzipping script (not used in analysis)
+│   ├── extract_features.py         # Feature extraction logic
+│   ├── evaluate_ml_models.py       # ML model pipeline
+│   ├── visualize_features.py       # Feature-level plots
+│   └── visualize_audio.py          # Audio waveform / spectrogram visualization
+│
+├── 0. extract_features.ipynb       # Step 0 - Extract features from audio/transcripts
+├── 1. eda.ipynb                    # Step 1 - Exploratory Data Analysis
+├── 2. evaluate_basic_models.ipynb  # Step 2 - Classical ML model evaluation
+│
+├── README.md                       
+├── requirements.txt               
+└── .gitignore                     
+
 ```

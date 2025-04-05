@@ -2,6 +2,7 @@ downloads/
 unzipped_files/
 wav_files/
 transcript_files/
+legacy/
 etc/url.txt
 __pycache__/
 *.pyc
