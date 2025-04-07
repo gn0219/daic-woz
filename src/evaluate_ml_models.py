@@ -1,5 +1,6 @@
 from sklearn.feature_selection import SelectKBest, f_classif, SelectFromModel
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, classification_report, confusion_matrix
+from sklearn.metrics import precision_score, recall_score
 from sklearn.svm import SVC, LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
@@ -98,7 +99,9 @@ class MLPipeline:
                 'Model': 'Baseline (Majority Voting)',
                 'Accuracy': accuracy_score(y_eval, y_pred_dummy),
                 'F1(macro)': f1_score(y_eval, y_pred_dummy, average='macro'),
-                'AUROC': auroc_dummy
+                'AUROC': auroc_dummy,
+                'Precision': precision_score(y_eval, y_pred_dummy, average='macro'),
+                'Recall': recall_score(y_eval, y_pred_dummy, average='macro'),
             })
 
             if report:
@@ -120,11 +123,22 @@ class MLPipeline:
                 'Model': model_name,
                 'Accuracy': accuracy_score(y_eval, y_pred),
                 'F1(macro)': f1_score(y_eval, y_pred, average='macro'),
-                'AUROC': auroc
+                'AUROC': auroc,
+                'Precision': precision_score(y_eval, y_pred, average='macro'),
+                'Recall': recall_score(y_eval, y_pred, average='macro'),
             })
 
             if report:
                 reports[model_name]['report'] = classification_report(y_eval, y_pred, output_dict=True)
                 reports[model_name]['confusion_matrix'] = confusion_matrix(y_eval, y_pred)
+
+                eval_df = self.df[self.df[self.split_col] == self.eval_split].copy()
+                eval_df = eval_df.reset_index(drop=True)  # y_eval/y_pred랑 인덱스 맞추기 위해
+                reports[model_name]['per_sample'] = pd.DataFrame({
+                    'Participant_ID': eval_df['Participant_ID'].values,
+                    'True Label': y_eval,
+                    'Predicted Label': y_pred,
+                    'Correct': y_eval == y_pred
+                })
 
         return (pd.DataFrame(results), reports) if report else pd.DataFrame(results)

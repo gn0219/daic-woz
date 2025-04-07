@@ -22,4 +22,5 @@ from .visualize_audio import (
 
 from .visualize_results import (
     plot_result,
+    plot_cm
 )
