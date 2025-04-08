@@ -7,7 +7,7 @@ warnings.filterwarnings("ignore")
 
 plt.style.use("ggplot")
 
-def bar_chart(df, column, title=None, option='basic', hue=None):
+def bar_chart(df, column, title=None, option='basic', hue=None, save_path = None):
     """
     Plots a bar chart based on the specified option.
 
@@ -58,11 +58,21 @@ def bar_chart(df, column, title=None, option='basic', hue=None):
 
     else:
         raise ValueError("Invalid option. Choose from 'basic', 'grouped', or 'stacked'.")
+    
+    plt.grid(axis='y', linestyle='--', color='gray', alpha=0.2)
+    ax = plt.gca()
+    for spine in ax.spines.values():
+        spine.set_visible(True)
+        spine.set_color('gray')
+        spine.set_linewidth(0.5)
 
     plt.grid(axis='y', linestyle='--', alpha=0.7)
     plt.xticks(fontsize=10, rotation=0)
     plt.yticks(fontsize=10)
     plt.tight_layout()
+
+    if save_path:
+        plt.savefig(f'viz/eda/{title.replace(":", "-")}.png', dpi=300, bbox_inches='tight', transparent=False)
     plt.show()
 
 def print_stats(df, group_vars, value_col):
@@ -82,7 +92,23 @@ def print_stats(df, group_vars, value_col):
     
     print("==========================")
 
-def plot_histogram(df, column, title, bins=30, color='slateblue', kde=True, hue=None, palette='husl', print_summary=True):
+def print_mannwhitney(df, group_col, value_col):
+    """
+    Prints Mann-Whitney U test results for two groups in a DataFrame.
+    """
+    from scipy.stats import mannwhitneyu
+
+    if df[group_col].nunique() != 2:
+        raise ValueError("Mann-Whitney U test requires exactly two groups.")
+
+    group1 = df[df[group_col] == df[group_col].unique()[0]][value_col]
+    group2 = df[df[group_col] == df[group_col].unique()[1]][value_col]
+
+    stat, p_value = mannwhitneyu(group1, group2, alternative='two-sided')
+    
+    print(f"Mann-Whitney U test: U-statistic = {stat:.2f}, p-value = {p_value:.4f}")
+
+def plot_histogram(df, column, title, bins=30, color='slateblue', kde=True, hue=None, palette='husl', print_summary=True, save_path = None):
     """
     Plots a histogram for a specified column, optionally grouped by hue.
     Also prints summary statistics if print_summary is True.
@@ -99,16 +125,27 @@ def plot_histogram(df, column, title, bins=30, color='slateblue', kde=True, hue=
         if print_summary:
             print_stats(df, group_vars=None, value_col=column)
 
+    plt.grid(axis='y', linestyle='--', color='gray', alpha=0.2)
+    ax = plt.gca()
+    for spine in ax.spines.values():
+        spine.set_visible(True)
+        spine.set_color('gray')
+        spine.set_linewidth(0.5)
+
     plt.title(title, fontsize=16, fontweight='bold')
     plt.xlabel(column, fontsize=12)
     plt.ylabel('Density' if kde else 'Frequency', fontsize=12)
     plt.grid(axis='y', linestyle='--', alpha=0.7)
     plt.tight_layout()
+
+    if save_path:
+        plt.savefig(f'viz/eda/{title.replace(":", "-")}.png', dpi=300, bbox_inches='tight', transparent=False)
+
     plt.show()
 
 
 
-def plot_numeric(data, columns, title, hue=None, category_col=None, palette="husl", option='box', print_summary=True):
+def plot_numeric(data, columns, title, hue=None, category_col=None, palette="husl", option='box', print_summary=True, save_path = None):
     """
     Plots a boxplot or violin plot for numeric data with optional grouping.
     Also prints mean and standard deviation per group.
@@ -144,6 +181,7 @@ def plot_numeric(data, columns, title, hue=None, category_col=None, palette="hus
 
         if print_summary:
             print_stats(melted_data.dropna(), ["Group"], "Value")
+            print_mannwhitney(melted_data, "Group", "Value")
 
         plt.figure(figsize=(6, 4))
         sns_func(data=melted_data, x="Group", y="Value", palette=palette)
@@ -178,5 +216,16 @@ def plot_numeric(data, columns, title, hue=None, category_col=None, palette="hus
         sns_func(data=data[columns], palette=palette)
         plt.title(title, fontsize=14, fontweight='bold')
 
+    plt.grid(axis='y', linestyle='--', color='gray', alpha=0.2)
+    ax = plt.gca()
+    for spine in ax.spines.values():
+        spine.set_visible(True)
+        spine.set_color('gray')
+        spine.set_linewidth(0.5)
+
     plt.tight_layout()
+
+    if save_path:
+        plt.savefig(f'viz/eda/{title.replace(":", "-")}.png', dpi=300, bbox_inches='tight', transparent=False)
+
     plt.show()

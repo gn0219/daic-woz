@@ -28,15 +28,16 @@ def plot_result(result: pd.DataFrame, col: str ='Model', metric: str = 'F1(macro
         legend.get_frame().set_edgecolor('gray')      
         legend.get_frame().set_linewidth(0.5)          
         legend.get_frame().set_facecolor('#f4f4f4')    
-        legend.get_frame().set_alpha(0.5)
+        legend.get_frame().set_alpha(0.7)
 
     sns.barplot(data=performance, y=col, x="Score", orient="h", palette=colors[:len(performance)])
 
     # Add edge color
+    plt.grid(axis='y', linestyle='--', color='gray', alpha=0.5)
     ax = plt.gca()
     for spine in ax.spines.values():
         spine.set_visible(True)
-        spine.set_color('black')
+        spine.set_color('gray')
         spine.set_linewidth(0.5)
     if title is None:
         title = f"{col} Performance - {metric}"
@@ -63,6 +64,7 @@ def plot_cm(cm, class_names=['ND', 'D'],
     ax.set_ylabel("True Label", fontsize=15, weight='bold', labelpad=10)
     ax.tick_params(axis='both', labelsize=13)
 
+    plt.grid(axis='y', linestyle='--', color='gray', alpha=0.2)
     for spine in ax.spines.values():
         spine.set_visible(True)
         spine.set_color('black')
