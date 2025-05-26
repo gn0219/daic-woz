@@ -131,7 +131,7 @@ This process produces three feature files: `info_df.csv`, `utterance_features.cs
 
 ## 3. topological_features.ipynb
 <div align="center">
-<img src = "etc/tda_sample.png" width=60%>
+<img src = "etc/tda_sample.png" width=40%>
 </div>
 
 - Initial visualization of topological features from audio-derived point clouds
