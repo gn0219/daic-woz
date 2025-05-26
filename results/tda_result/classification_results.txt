@@ -1,0 +1,14 @@
+Random Forest Classification Results (1D Persistence Images):
+
+              precision    recall  f1-score   support
+
+           0       0.67      0.79      0.72        33
+           1       0.12      0.07      0.09        14
+
+    accuracy                           0.57        47
+   macro avg       0.40      0.43      0.41        47
+weighted avg       0.51      0.57      0.53        47
+
+Accuracy: 0.5745
+AUROC: 0.4340
+F1-macro: 0.4066

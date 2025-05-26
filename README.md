@@ -118,7 +118,8 @@ This process produces three feature files: `info_df.csv`, `utterance_features.cs
   - [`src/visualize_audio.py`](./src/visualize_audio.py): waveform and log-spectrogram visualizations
 
 ## 2. evaluate_basic_models.ipynb
-<img src = "etc/ml_overview.png" width="600">
+<img src = "etc/ml_overview.png">
+
 - Implements basic ML model evaluation using only the `train`/`test` splits (excluding `dev`)
 - Evaluates 7 models: Baseline (Majority voting), SVM, KNN, Random Forest, Logistic Regression, Gradient Boosting, XGBoost
 - Compares three input settings:
@@ -132,38 +133,40 @@ This process produces three feature files: `info_df.csv`, `utterance_features.cs
 <div align="center">
 <img src = "etc/tda_sample.png" width=60%>
 </div>
+
 - Initial visualization of topological features from audio-derived point clouds
 
 ## 4. SHAP.ipynb
-- Conducts SHAP analysis on the trained XGBoost model
+- Conducts **SHAP analysis** on the trained **XGBoost** model
 - Provides both global and local interpretability of feature contributions
 - Results saved in: [`results/SHAP_result`](./results/SHAP_result/)
 
 # Advanced Methods
 
-## Approach 1: LSTM (`run_lstm.py`)
+## Approach 1: LSTM (`5-1.run_lstm.py`)
 - Implements an LSTM model on extracted feature sequences (utterance-related + opensmile)
 - Results saved in: [results/lstm_results/*](results/lstm_results/)
 
-## Approach 2: Multimodal learning (`run_multimodal.py`)
-- Applies two separate DNN encoders to:
+## Approach 2: Multimodal learning (`5-2.run_multimodal.py`)
+- Applies two **separate DNN encoders** to:
   - Utterance-related features (37 dims)
   - Audio features extracted via openSMILE (88 dims)
 - Combines both modalities for classification
 - Results saved in: [results/multimodal_results/*](results/multimodal_results/)
 
-## Approach 3: Multitask learning (`run_multitask_learning.py`)
-- Use `gender` as an auxilary task to support the main classification task
-- Applies different loss weights when calculating multitask loss (main task : auxiliary task = 1 : 0.3)
+## Approach 3: Multitask learning (`5-3.run_multitask_learning.py`)
+- Use `gender` as an **auxilary task** to support the main classification task
+- Applies **different loss weights** when calculating multitask loss (main task : auxiliary task = 1 : 0.3)
 - Compares multitask vs. single-task performance on Accuracy, F1, and AUROC
 - Results saved in: [results/multitask/*](results/multitask/)
 
-## Approach 4: Topological Data Analysis (`tda_depression_detect.py`)
+## Approach 4: Topological Data Analysis (`5-4.tda_depression_detect.py`)
 - Applies **persistent homology** to convert audio into topological representations
   - Converts audio into 3D point clouds using sliding windows and PCA  
   - Computes 0D and 1D persistence diagrams with Ripser and transforms them into persistence images  
-  - Trains a Random Forest classifier on flattened images (CNN version included but commented out)  
+  - Trains a **Random Forest** classifier on flattened images
   - Evaluated using Accuracy, AUROC, F1, and Confusion Matrix
+- Results saved in: [result/tda_result/*](results/tda_result/)
 
 # Project folder structure (after Analysis)
 
@@ -192,7 +195,9 @@ daic-woz/
 │   ├── evaluate_ml_models.py       # ML model pipeline
 │   ├── visualize_features.py       # Feature-level plots
 │   ├── visualize_audio.py          # Audio waveform / spectrogram visualization
-│   └── visualize_results.py        # Performance visualization (TODO: add confusion matrix visualization)
+│   └── visualize_results.py        # Performance visualization
+
+├── results/                            # Figures and texts
 │
 ├── 0-1. extract_features.ipynb                 # Feature extraction from audio/transcripts
 ├── 0-2. silence_removal.ipynb                  # Optional: silence removal from audio (preprocessing)
@@ -202,10 +207,10 @@ daic-woz/
 ├── 3. topological_features.ipynb               # Topological data analysis & visualization
 ├── 4. SHAP.ipynb                               # SHAP-based model explanation (XGBoost)
 │
-├── run_lstm.py                    # Approach 1: LSTM on sequential features
-├── run_multimodal.py              # Approach 2: Multimodal deep learning (SMILE + utterance)
-├── run_multitask_learning.py      # Approach 3: Multitask learning with gender as auxiliary
-├── tda_depression_detect.py       # Approach 4: Topological Data Analysis (TDA)
+├── 5-1.run_lstm.py                 # Approach 1: LSTM on sequential features
+├── 5-2.run_multimodal.py           # Approach 2: Multimodal deep learning (SMILE + utterance)
+├── 5-3.run_multitask_learning.py   # Approach 3: Multitask learning with gender as auxiliary
+├── 5-4.tda_depression_detect.py    # Approach 4: Topological Data Analysis (TDA)
 │
 ├── README.md                       
 ├── requirements.txt               
