@@ -1,3 +1,7 @@
+# DS516 Team Project (Group 1)
+- Developing an Audio-Based Depression Detection Model
+- Gyuna Kim, Soobin Park, Hyeonjin Lim, Seunghyun Kim
+
 <details>
 <summary> Setup (click to expand)</summary>
 
@@ -102,46 +106,78 @@ daic-woz/
 
 # Analysis
 ## 0. extract_features.ipynb
-After this process, we have `info_df.csv`, `utterance_features.csv`, and `smile_features.csv`.
-- Done
-  - Extract utterance related features from transcription files
-  - Extract openSMILE features from raw wav files
-  - `src/extract_features.py`
-- TODO: Extract openSMILE features after silence removal
+This process produces three feature files: `info_df.csv`, `utterance_features.csv`, and `smile_features.csv`.
+- Extract utterance-related features from transcription files
+- Extract audio features using openSMILE from raw `.wav` files 
+- Source code: [`src/extract_features.py`](./src/extract_features.py)
 
 ## 1. eda.ipynb
-- Done
-  - Visualize label information
-  - Modularize visualization code `src/visualize_features.py`
-    - histogram, numeric(boxplot or violinplot)
-  - Visualize audio file `src/visualize_audio.py`
-    - waveform, log spectrogram
+- Visualizes label distribution and audio-derived features
+- Visualization functions are modularized in:
+  - [`src/visualize_features.py`](./src/visualize_features.py): histograms, boxplots, violin plots
+  - [`src/visualize_audio.py`](./src/visualize_audio.py): waveform and log-spectrogram visualizations
 
 ## 2. evaluate_basic_models.ipynb
-- Done
-  - Implement code `src/evaluate_ml_models.py` by only using `train` and `test` (not `dev`)
-    - Evaluate 7 models (including majority voting as a baseline model)
-      -  Baseline, SVM, KNN, RF, LR, GB, XGB
-    - Experiment with three different settings (smile features on raw data, utterance features, and merged version of them)
-    - Perform two differnt feature selection methods by setting `use_feature_selection=True`
-      - `selection_method='kbest'` or `selection_method='model'`
+<img src = "etc/ml_overview.png" width="600">
+- Implements basic ML model evaluation using only the `train`/`test` splits (excluding `dev`)
+- Evaluates 7 models: Baseline (Majority voting), SVM, KNN, Random Forest, Logistic Regression, Gradient Boosting, XGBoost
+- Compares three input settings:
+  1. SMILE features
+  2. Utterance features
+  3. Combined features
+- Supports optional feature selection using either `kbest` or `model` method
+- Source code: [`src/evaluate_ml_models.py`](./src/evaluate_ml_models.py)
 
 ## 3. topological_features.ipynb
-- Done (Seunghyun)
-  - Initial visualization
-- TODO: Expand to all UID (Gyuna)
+<div align="center">
+<img src = "etc/tda_sample.png" width=60%>
+</div>
+- Initial visualization of topological features from audio-derived point clouds
 
-## TODO: DL models
+## 4. SHAP.ipynb
+- Conducts SHAP analysis on the trained XGBoost model
+- Provides both global and local interpretability of feature contributions
+- Results saved in: [`results/SHAP_result`](./results/SHAP_result/)
 
-## Project folder structure (after Analysis)
+# Advanced Methods
+
+## Approach 1: LSTM (`run_lstm.py`)
+- Implements an LSTM model on extracted feature sequences (utterance-related + opensmile)
+- Results saved in: [results/lstm_results/*](results/lstm_results/)
+
+## Approach 2: Multimodal learning (`run_multimodal.py`)
+- Applies two separate DNN encoders to:
+  - Utterance-related features (37 dims)
+  - Audio features extracted via openSMILE (88 dims)
+- Combines both modalities for classification
+- Results saved in: [results/multimodal_results/*](results/multimodal_results/)
+
+## Approach 3: Multitask learning (`run_multitask_learning.py`)
+- Use `gender` as an auxilary task to support the main classification task
+- Applies different loss weights when calculating multitask loss (main task : auxiliary task = 1 : 0.3)
+- Compares multitask vs. single-task performance on Accuracy, F1, and AUROC
+- Results saved in: [results/multitask/*](results/multitask/)
+
+## Approach 4: Topological Data Analysis (`tda_depression_detect.py`)
+- Applies **persistent homology** to convert audio into topological representations
+  - Converts audio into 3D point clouds using sliding windows and PCA  
+  - Computes 0D and 1D persistence diagrams with Ripser and transforms them into persistence images  
+  - Trains a Random Forest classifier on flattened images (CNN version included but commented out)  
+  - Evaluated using Accuracy, AUROC, F1, and Confusion Matrix
+
+# Project folder structure (after Analysis)
+
+> Note: Files under data/* are not included due to EULA restrictions.
+> You can reproduce them by downloading the original data and running 0-1. extract_features.ipynb.
 
 ```plaintext
 daic-woz/
-│
+│   
 ├── data/                           # CSV files (preprocessed / feature-extracted)
 │   ├── df.csv
 │   ├── info_df.csv
 │   ├── smile_features.csv
+│   ├── smile_features_silence_removed.csv
 │   ├── utterance_features.csv
 │
 ├── downloads/                      # Raw .zip files (not used during analysis)
@@ -158,10 +194,18 @@ daic-woz/
 │   ├── visualize_audio.py          # Audio waveform / spectrogram visualization
 │   └── visualize_results.py        # Performance visualization (TODO: add confusion matrix visualization)
 │
-├── 0. extract_features.ipynb       # Step 0 - Extract features from audio/transcripts
-├── 1. eda.ipynb                    # Step 1 - Exploratory Data Analysis
-├── 2. evaluate_basic_models.ipynb  # Step 2 - Classical ML model evaluation
-├── 3. topological_features.ipynb   # Step 3 - Topological Data Analysis
+├── 0-1. extract_features.ipynb                 # Feature extraction from audio/transcripts
+├── 0-2. silence_removal.ipynb                  # Optional: silence removal from audio (preprocessing)
+├── 1. eda.ipynb                                # Exploratory Data Analysis (EDA)
+├── 2-1. evaluate_basic_models.ipynb            # Classical ML model evaluation
+├── 2-2. silence_removed_evaluate_basic_models.ipynb  # ML evaluation after silence removal
+├── 3. topological_features.ipynb               # Topological data analysis & visualization
+├── 4. SHAP.ipynb                               # SHAP-based model explanation (XGBoost)
+│
+├── run_lstm.py                    # Approach 1: LSTM on sequential features
+├── run_multimodal.py              # Approach 2: Multimodal deep learning (SMILE + utterance)
+├── run_multitask_learning.py      # Approach 3: Multitask learning with gender as auxiliary
+├── tda_depression_detect.py       # Approach 4: Topological Data Analysis (TDA)
 │
 ├── README.md                       
 ├── requirements.txt               

@@ -290,7 +290,7 @@ def train_stl(model, train_loader, val_loader, epochs=1000, lr=1e-3, patience=20
     model.load_state_dict(best_model)
     return train_losses, val_losses, early_stop_epoch
 
-def plot_losses(mtl_train_losses, mtl_val_losses, mtl_early_stop, stl_train_losses, stl_val_losses, stl_early_stop, save_dir='results/multitask'):
+def plot_losses(mtl_train_losses, mtl_val_losses, mtl_early_stop, stl_train_losses, stl_val_losses, stl_early_stop, save_dir='results/multitask_result'):
     plt.figure(figsize=(10, 8))
     
     # Plot MTL losses
@@ -361,10 +361,10 @@ def evaluate_on_test(model, test_loader, multitask=False, model_name="model"):
     # Save confusion matrix plot with appropriate title
     title = f"Confusion Matrix - {model_name.upper()}"
     plot_cm(cm, class_names=['Non-depressed', 'Depressed'], 
-            title=title, save_path=f'results/multitask/{model_name}_confusion_matrix.png')
+            title=title, save_path=f'results/multitask_result/{model_name}_confusion_matrix.png')
     
     # Save results to file
-    with open(f'results/multitask/{model_name}_results.txt', 'w') as f:
+    with open(f'results/multitask_result/{model_name}_results.txt', 'w') as f:
         f.write(f"Model: {model_name}\n")
         f.write(f"Accuracy: {acc:.4f}\n")
         f.write(f"F1 Score: {f1:.4f}\n")
@@ -373,8 +373,8 @@ def evaluate_on_test(model, test_loader, multitask=False, model_name="model"):
         f.write(str(cm))
     
     print(f"Test Accuracy: {acc:.4f} | Test F1: {f1:.4f} | Test AUROC: {auroc:.4f}")
-    print(f"Results saved to results/multitask/{model_name}_results.txt")
-    print(f"Confusion matrix plot saved to results/multitask/{model_name}_confusion_matrix.png")
+    print(f"Results saved to results/multitask_result/{model_name}_results.txt")
+    print(f"Confusion matrix plot saved to results/multitask_result/{model_name}_confusion_matrix.png")
 
 # =====================
 # 6. Main Execution

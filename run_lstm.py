@@ -220,7 +220,7 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
     
     return best_model_state, train_losses, val_losses, train_aurocs, val_aurocs, train_f1s, val_f1s
 
-def evaluate_model(model, test_loader, device, results_dir='results/lstm_results'):
+def evaluate_model(model, test_loader, device, results_dir='results/lstm_result'):
     model.eval()
     all_preds = []
     all_labels = []
@@ -262,7 +262,7 @@ def evaluate_model(model, test_loader, device, results_dir='results/lstm_results
         'recall': recall
     }
 
-def plot_metrics(train_losses, val_losses, train_aurocs, val_aurocs, train_f1s, val_f1s, save_dir='results/lstm_results'):
+def plot_metrics(train_losses, val_losses, train_aurocs, val_aurocs, train_f1s, val_f1s, save_dir='results/lstm_result'):
     # Create a single figure with subplots
     plt.figure(figsize=(15, 10))
     
@@ -305,7 +305,7 @@ def main():
     args = parse_args()
     
     # Create results directory with experiment name
-    exp_name = "lstm_results"
+    exp_name = "lstm_result"
     results_dir = f'results/{exp_name}'
     Path(results_dir).mkdir(exist_ok=True)
     

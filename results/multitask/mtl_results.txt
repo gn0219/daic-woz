@@ -1,8 +1,0 @@
-Model: mtl
-Accuracy: 0.7447
-F1 Score: 0.6810
-AUROC: 0.6385
-
-Confusion Matrix:
-[[28  5]
- [ 7  7]]

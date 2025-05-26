@@ -12,5 +12,6 @@ __pycache__/
 .env
 .DS_Store
 Thumbs.db
+ref_papers
 
 # ref_papers

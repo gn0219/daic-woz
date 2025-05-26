@@ -262,7 +262,7 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, scheduler
     
     return best_model_state, train_losses, val_losses, train_aurocs, val_aurocs, train_f1s, val_f1s, early_stop_epoch
 
-def evaluate_model(model, test_loader, device, results_dir='results/multimodal_results'):
+def evaluate_model(model, test_loader, device, results_dir='results/multimodal_result'):
     model.eval()
     all_preds = []
     all_labels = []
@@ -304,7 +304,7 @@ def evaluate_model(model, test_loader, device, results_dir='results/multimodal_r
         'recall': recall
     }
 
-def plot_metrics(train_losses, val_losses, train_aurocs, val_aurocs, train_f1s, val_f1s, early_stop_epoch, save_dir='results/multimodal_results'):
+def plot_metrics(train_losses, val_losses, train_aurocs, val_aurocs, train_f1s, val_f1s, early_stop_epoch, save_dir='results/multimodal_result'):
     # Create a single figure with subplots
     plt.figure(figsize=(10, 12))
     
@@ -353,7 +353,7 @@ def main():
     args = parse_args()
     
     # Create results directory with experiment name
-    exp_name = f"multimodal_results"
+    exp_name = f"multimodal_result"
     results_dir = f'results/{exp_name}'
     Path(results_dir).mkdir(exist_ok=True)
     
