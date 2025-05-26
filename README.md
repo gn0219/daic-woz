@@ -13,12 +13,11 @@ Data access requires signing the EULA from [dcapswoz.ict.usc.edu](http://dcapswo
 
 > Gratch, J., Artstein, R., Lucas, G. M., Stratou, G., Scherer, S., Nazarian, A., ... & Morency, L. P. (2014, May). The distress analysis interview corpus of human and computer interviews. In LREC (Vol. 14, pp. 3123-3128).
 
-For more information, visit: http://dcapswoz.ict.usc.edu/
+# Setup
 
 <details>
 <summary> Setup (click to expand)</summary>
 
-# Setup
 ## Clone this repository
 
 ```bash
