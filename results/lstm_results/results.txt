@@ -5,10 +5,12 @@ Number of Layers: 2
 Dropout: 0.5
 Batch Size: 32
 Learning Rate: 0.001
+Epochs: 1000
+Patience: 20
 
 Results:
-Accuracy: 0.6897
-F1 Score (Macro): 0.4082
-AUROC: 0.4861
-Precision: 0.0000
-Recall: 0.0000
+Accuracy: 0.6522
+F1 Score (Macro): 0.5893
+AUROC: 0.6250
+Precision: 0.4286
+Recall: 0.4286

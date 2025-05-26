@@ -6,9 +6,10 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import f1_score, accuracy_score, confusion_matrix
+from sklearn.metrics import f1_score, accuracy_score, confusion_matrix, roc_auc_score
 import os
 import random
+import matplotlib.pyplot as plt
 
 from src import plot_result, plot_cm
 
@@ -101,64 +102,20 @@ class SingleTaskDataset(Dataset):
 # 3. Improved Models
 # =====================
 
-class DeepMultiTaskMLP(nn.Module):
-    def __init__(self, input_dim, hidden_dims=[256, 128, 64], dropout=0.3):
-        super().__init__()
-        layers = []
-        for in_dim, out_dim in zip([input_dim] + hidden_dims[:-1], hidden_dims):
-            layers.append(nn.Linear(in_dim, out_dim))
-            layers.append(nn.BatchNorm1d(out_dim))
-            layers.append(nn.ReLU())
-            layers.append(nn.Dropout(dropout))
-        self.shared = nn.Sequential(*layers)
-
-        self.head_main = nn.Sequential(
-            nn.Linear(hidden_dims[-1], 64),
-            nn.ReLU(),
-            nn.Linear(64, 1)
-        )
-        self.head_aux = nn.Sequential(
-            nn.Linear(hidden_dims[-1], 64),
-            nn.ReLU(),
-            nn.Linear(64, 1)
-        )
-
-    def forward(self, x):
-        h = self.shared(x)
-        out_main = torch.sigmoid(self.head_main(h))
-        out_aux = torch.sigmoid(self.head_aux(h))
-        return out_main, out_aux
-
-class DeepSingleTaskMLP(nn.Module):
-    def __init__(self, input_dim, hidden_dims=[256, 128, 64], dropout=0.3):
-        super().__init__()
-        layers = []
-        for in_dim, out_dim in zip([input_dim] + hidden_dims[:-1], hidden_dims):
-            layers.append(nn.Linear(in_dim, out_dim))
-            layers.append(nn.BatchNorm1d(out_dim))
-            layers.append(nn.ReLU())
-            layers.append(nn.Dropout(dropout))
-        layers.append(nn.Linear(hidden_dims[-1], 1))
-        self.model = nn.Sequential(*layers)
-
-    def forward(self, x):
-        return torch.sigmoid(self.model(x))
-
-
 class DeepMultiTaskMLP_Improved(nn.Module):
     def __init__(self, input_dim, hidden_dims=[512, 256, 128], dropout=0.4):
         super().__init__()
         self.shared = nn.Sequential(
             nn.Linear(input_dim, hidden_dims[0]),
-            nn.LayerNorm(hidden_dims[0]),
+            nn.BatchNorm1d(hidden_dims[0]),
             nn.ReLU(),
             nn.Dropout(dropout),
             nn.Linear(hidden_dims[0], hidden_dims[1]),
-            nn.LayerNorm(hidden_dims[1]),
+            nn.BatchNorm1d(hidden_dims[1]),
             nn.ReLU(),
             nn.Dropout(dropout),
             nn.Linear(hidden_dims[1], hidden_dims[2]),
-            nn.LayerNorm(hidden_dims[2]),
+            nn.BatchNorm1d(hidden_dims[2]),
             nn.ReLU(),
             nn.Dropout(dropout)
         )
@@ -183,8 +140,8 @@ class DeepMultiTaskMLP_Improved(nn.Module):
         h = self.shared(x)
         attention = self.se(h)
         h = h * attention
-        out_main = torch.sigmoid(self.head_main(h))
-        out_aux = torch.sigmoid(self.head_aux(h))
+        out_main = self.head_main(h)
+        out_aux = self.head_aux(h)
         return out_main, out_aux
 
 class DeepSingleTaskMLP_Improved(nn.Module):
@@ -192,76 +149,45 @@ class DeepSingleTaskMLP_Improved(nn.Module):
         super().__init__()
         self.model = nn.Sequential(
             nn.Linear(input_dim, hidden_dims[0]),
-            nn.LayerNorm(hidden_dims[0]),
+            nn.BatchNorm1d(hidden_dims[0]),
             nn.ReLU(),
             nn.Dropout(dropout),
             nn.Linear(hidden_dims[0], hidden_dims[1]),
-            nn.LayerNorm(hidden_dims[1]),
+            nn.BatchNorm1d(hidden_dims[1]),
             nn.ReLU(),
             nn.Dropout(dropout),
             nn.Linear(hidden_dims[1], hidden_dims[2]),
-            nn.LayerNorm(hidden_dims[2]),
+            nn.BatchNorm1d(hidden_dims[2]),
             nn.ReLU(),
             nn.Dropout(dropout),
             nn.Linear(hidden_dims[2], 1)
         )
 
     def forward(self, x):
-        return torch.sigmoid(self.model(x))
+        return self.model(x)
 
-class MultiTaskMLP(nn.Module):
-    def __init__(self, input_dim, hidden_dims=[256, 128, 64], dropout=0.3):
-        super().__init__()
-        layers = []
-        for in_dim, out_dim in zip([input_dim]+hidden_dims[:-1], hidden_dims):
-            layers.append(nn.Linear(in_dim, out_dim))
-            layers.append(nn.BatchNorm1d(out_dim))
-            layers.append(nn.ReLU())
-            layers.append(nn.Dropout(dropout))
-        self.shared = nn.Sequential(*layers)
-
-        self.head_main = nn.Sequential(
-            nn.Linear(hidden_dims[-1], 64),
-            nn.ReLU(),
-            nn.Linear(64, 1)
-        )
-        self.head_aux = nn.Sequential(
-            nn.Linear(hidden_dims[-1], 64),
-            nn.ReLU(),
-            nn.Linear(64, 1)
-        )
-
-    def forward(self, x):
-        h = self.shared(x)
-        out_main = torch.sigmoid(self.head_main(h))
-        out_aux = torch.sigmoid(self.head_aux(h))
-        return out_main, out_aux
-
-class SingleTaskMLP(nn.Module):
-    def __init__(self, input_dim, hidden_dims=[256, 128, 64], dropout=0.3):
-        super().__init__()
-        layers = []
-        for in_dim, out_dim in zip([input_dim]+hidden_dims[:-1], hidden_dims):
-            layers.append(nn.Linear(in_dim, out_dim))
-            layers.append(nn.BatchNorm1d(out_dim))
-            layers.append(nn.ReLU())
-            layers.append(nn.Dropout(dropout))
-        layers.append(nn.Linear(hidden_dims[-1], 1))
-        self.model = nn.Sequential(*layers)
-
-    def forward(self, x):
-        return torch.sigmoid(self.model(x))
 
 # =====================
 # 4. Training Functions with Early Stopping
 # =====================
 
-def train_mtl(model, train_loader, val_loader, epochs=50, lr=1e-3, patience=20):
-    criterion = nn.BCELoss()
+def train_mtl(model, train_loader, val_loader, epochs=1000, lr=1e-3, patience=20):
+    # Calculate class weights
+    pos_weight_main = torch.tensor([2.5666]).to(device)  # Adjust this weight based on your class imbalance
+    pos_weight_aux = torch.tensor([1.0434]).to(device)   # Adjust this weight based on your class imbalance
+    
+    criterion_main = nn.BCEWithLogitsLoss(pos_weight=pos_weight_main)
+    criterion_aux = nn.BCEWithLogitsLoss(pos_weight=pos_weight_aux)
+    
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     best_val_loss = np.inf
     best_model = None
     patience_counter = 0
+    
+    # Store losses for plotting
+    train_losses = []
+    val_losses = []
+    early_stop_epoch = None
 
     for epoch in range(epochs):
         model.train()
@@ -271,12 +197,14 @@ def train_mtl(model, train_loader, val_loader, epochs=50, lr=1e-3, patience=20):
         
             optimizer.zero_grad()
             out_main, out_aux = model(X_batch)
-            loss_main = criterion(out_main, y_main)
-            loss_aux = criterion(out_aux, y_aux)
+            loss_main = criterion_main(out_main, y_main)
+            loss_aux = criterion_aux(out_aux, y_aux)
             loss = loss_main + 0.3 * loss_aux
             loss.backward()
             optimizer.step()
             total_loss += loss.item()
+        
+        train_losses.append(total_loss / len(train_loader))
 
         model.eval()
         val_loss = 0
@@ -285,11 +213,13 @@ def train_mtl(model, train_loader, val_loader, epochs=50, lr=1e-3, patience=20):
                 X_batch, y_main, y_aux = X_batch.to(device), y_main.to(device), y_aux.to(device)
 
                 out_main, out_aux = model(X_batch)
-                loss_main = criterion(out_main, y_main)
-                loss_aux = criterion(out_aux, y_aux)
+                loss_main = criterion_main(out_main, y_main)
+                loss_aux = criterion_aux(out_aux, y_aux)
                 val_loss += (loss_main + 0.3 * loss_aux).item()
+        
+        val_losses.append(val_loss / len(val_loader))
 
-        print(f"[MTL] Epoch {epoch+1} | Train Loss: {total_loss:.4f} | Val Loss: {val_loss:.4f}")
+        print(f"[MTL] Epoch {epoch+1} | Train Loss: {train_losses[-1]:.4f} | Val Loss: {val_losses[-1]:.4f}")
 
         if val_loss < best_val_loss:
             best_val_loss = val_loss
@@ -299,16 +229,23 @@ def train_mtl(model, train_loader, val_loader, epochs=50, lr=1e-3, patience=20):
             patience_counter += 1
             if patience_counter >= patience:
                 print("Early stopping!")
+                early_stop_epoch = epoch - patience
                 break
 
     model.load_state_dict(best_model)
+    return train_losses, val_losses, early_stop_epoch
 
-def train_stl(model, train_loader, val_loader, epochs=200, lr=1e-3, patience=20):
-    criterion = nn.BCELoss()
+def train_stl(model, train_loader, val_loader, epochs=1000, lr=1e-3, patience=20):
+    criterion = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([2.5666]).to(device))
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     best_val_loss = np.inf
     best_model = None
     patience_counter = 0
+    
+    # Store losses for plotting
+    train_losses = []
+    val_losses = []
+    early_stop_epoch = None
 
     for epoch in range(epochs):
         model.train()
@@ -322,6 +259,8 @@ def train_stl(model, train_loader, val_loader, epochs=200, lr=1e-3, patience=20)
             loss.backward()
             optimizer.step()
             total_loss += loss.item()
+        
+        train_losses.append(total_loss / len(train_loader))
 
         model.eval()
         val_loss = 0
@@ -332,8 +271,10 @@ def train_stl(model, train_loader, val_loader, epochs=200, lr=1e-3, patience=20)
                 out = model(X_batch)
                 loss = criterion(out, y_batch)
                 val_loss += loss.item()
+        
+        val_losses.append(val_loss / len(val_loader))
 
-        print(f"[STL] Epoch {epoch+1} | Train Loss: {total_loss:.4f} | Val Loss: {val_loss:.4f}")
+        print(f"[STL] Epoch {epoch+1} | Train Loss: {train_losses[-1]:.4f} | Val Loss: {val_losses[-1]:.4f}")
 
         if val_loss < best_val_loss:
             best_val_loss = val_loss
@@ -343,34 +284,97 @@ def train_stl(model, train_loader, val_loader, epochs=200, lr=1e-3, patience=20)
             patience_counter += 1
             if patience_counter >= patience:
                 print("Early stopping!")
+                early_stop_epoch = epoch - patience
                 break
 
     model.load_state_dict(best_model)
+    return train_losses, val_losses, early_stop_epoch
+
+def plot_losses(mtl_train_losses, mtl_val_losses, mtl_early_stop, stl_train_losses, stl_val_losses, stl_early_stop, save_dir='results/multitask'):
+    plt.figure(figsize=(10, 8))
+    
+    # Plot MTL losses
+    plt.subplot(2, 1, 1)
+    plt.plot(mtl_train_losses, label='MTL Training Loss')
+    plt.plot(mtl_val_losses, label='MTL Validation Loss')
+    if mtl_early_stop is not None:
+        plt.axvline(x=mtl_early_stop, color='r', linestyle='-', label='Early Stopping')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.title('MTL Training and Validation Loss')
+    plt.legend(loc='upper right', framealpha=0.5)
+    plt.grid(True)
+    
+    # Plot STL losses
+    plt.subplot(2, 1, 2)
+    plt.plot(stl_train_losses, label='STL Training Loss')
+    plt.plot(stl_val_losses, label='STL Validation Loss')
+    if stl_early_stop is not None:
+        plt.axvline(x=stl_early_stop, color='r', linestyle='-', label='Early Stopping')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.title('STL Training and Validation Loss')
+    plt.legend(loc='upper right', framealpha=0.5)
+    plt.grid(True)
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(save_dir, 'training_losses.png'))
+    plt.close()
 
 # =====================
 # 5. Evaluation Functions
 # =====================
 
-def evaluate_on_test(model, test_loader, multitask=False):
+def evaluate_on_test(model, test_loader, multitask=False, model_name="model"):
     model.eval()
-    y_true, y_pred = [], []
+    y_true, y_pred, y_pred_proba = [], [], []
     with torch.no_grad():
         for batch in test_loader:
             if multitask:
                 X_batch, y_batch, _ = batch
                 X_batch, y_batch = X_batch.to(device), y_batch.to(device)
                 out, _ = model(X_batch)
+                out = torch.sigmoid(out)  # Apply sigmoid for prediction
             else:
                 X_batch, y_batch = batch
                 X_batch, y_batch = X_batch.to(device), y_batch.to(device)
                 out = model(X_batch)
+                out = torch.sigmoid(out)  # Apply sigmoid for prediction
             preds = (out.squeeze() > 0.5).cpu().numpy()
             y_pred.extend(preds)
             y_true.extend(y_batch.squeeze().cpu().numpy())
+            y_pred_proba.extend(out.squeeze().cpu().numpy())
 
     acc = accuracy_score(y_true, y_pred)
     f1 = f1_score(y_true, y_pred, average='macro')
-    print(f"Test Accuracy: {acc:.4f} | Test F1: {f1:.4f}")
+    auroc = roc_auc_score(y_true, y_pred_proba)
+    cm = confusion_matrix(y_true, y_pred)
+    
+    # Save results
+    results = {
+        'accuracy': acc,
+        'f1_score': f1,
+        'auroc': auroc,
+        'confusion_matrix': cm.tolist()
+    }
+    
+    # Save confusion matrix plot with appropriate title
+    title = f"Confusion Matrix - {model_name.upper()}"
+    plot_cm(cm, class_names=['Non-depressed', 'Depressed'], 
+            title=title, save_path=f'results/multitask/{model_name}_confusion_matrix.png')
+    
+    # Save results to file
+    with open(f'results/multitask/{model_name}_results.txt', 'w') as f:
+        f.write(f"Model: {model_name}\n")
+        f.write(f"Accuracy: {acc:.4f}\n")
+        f.write(f"F1 Score: {f1:.4f}\n")
+        f.write(f"AUROC: {auroc:.4f}\n")
+        f.write("\nConfusion Matrix:\n")
+        f.write(str(cm))
+    
+    print(f"Test Accuracy: {acc:.4f} | Test F1: {f1:.4f} | Test AUROC: {auroc:.4f}")
+    print(f"Results saved to results/multitask/{model_name}_results.txt")
+    print(f"Confusion matrix plot saved to results/multitask/{model_name}_confusion_matrix.png")
 
 # =====================
 # 6. Main Execution
@@ -389,9 +393,8 @@ if __name__ == "__main__":
 
     model_mtl = DeepMultiTaskMLP_Improved(input_dim=X_train.shape[1]).to(device)
     
-    # model_mtl = MultiTaskMLP(input_dim=X_train.shape[1]).to(device)
-
-    train_mtl(model_mtl, train_loader_mtl, dev_loader_mtl)
+    # Train MTL model and get losses
+    mtl_train_losses, mtl_val_losses, mtl_early_stop = train_mtl(model_mtl, train_loader_mtl, dev_loader_mtl)
 
     train_dataset_stl = SingleTaskDataset(X_train, y_train_main)
     dev_dataset_stl = SingleTaskDataset(X_dev, y_dev_main)
@@ -403,12 +406,15 @@ if __name__ == "__main__":
 
     model_stl = DeepSingleTaskMLP_Improved(input_dim=X_train.shape[1]).to(device)
     
-    # model_stl = SingleTaskMLP(input_dim=X_train.shape[1]).to(device)
+    # Train STL model and get losses
+    stl_train_losses, stl_val_losses, stl_early_stop = train_stl(model_stl, train_loader_stl, dev_loader_stl)
 
-    train_stl(model_stl, train_loader_stl, dev_loader_stl)
+    # Plot losses
+    plot_losses(mtl_train_losses, mtl_val_losses, mtl_early_stop, stl_train_losses, stl_val_losses, stl_early_stop)
+
+    print("\nMTL Model Evaluation:")
+    evaluate_on_test(model_mtl, test_loader_mtl, multitask=True, model_name="mtl")
 
     print("STL Model Evaluation:")
-    evaluate_on_test(model_stl, test_loader_stl)
+    evaluate_on_test(model_stl, test_loader_stl, model_name="stl")
 
-    print("MTL Model Evaluation:")
-    evaluate_on_test(model_mtl, test_loader_mtl, multitask=True)

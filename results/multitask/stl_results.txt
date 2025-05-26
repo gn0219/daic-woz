@@ -1,0 +1,8 @@
+Model: stl
+Accuracy: 0.6596
+F1 Score: 0.6210
+AUROC: 0.6602
+
+Confusion Matrix:
+[[23 10]
+ [ 6  8]]
