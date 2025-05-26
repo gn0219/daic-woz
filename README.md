@@ -1,6 +1,19 @@
-# DS516 Team Project (Group 1)
-- Developing an Audio-Based Depression Detection Model
-- Gyuna Kim, Soobin Park, Hyeonjin Lim, Seunghyun Kim
+# DAIC-WOZ Audio Data Analysis
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![Jupyter Notebook](https://img.shields.io/badge/jupyter-%23FA0F00.svg?style=for-the-badge&logo=jupyter&logoColor=white)
+
+> This repository contains audio-based depression detection analysis based on the DAIC-WOZ dataset
+
+- KAIST DS516 Team Project
+  - Topic: Developing an Audio-Based Depression Detection Model
+  - Members: Gyuna Kim, Soobin Park, Hyeonjin Lim, Seunghyun Kim
+
+# 📂 Dataset Acknowledgement
+We used the **Distress Analysis Interview Corpus (DAIC-WOZ)** dataset provided under a restricted license.  
+Data access requires signing the EULA from [dcapswoz.ict.usc.edu](http://dcapswoz.ict.usc.edu/).
+
+> Gratch, J., Artstein, R., Lucas, G. M., Stratou, G., Scherer, S., Nazarian, A., ... & Morency, L. P. (2014, May). The distress analysis interview corpus of human and computer interviews. In LREC (Vol. 14, pp. 3123-3128).
+
+For more information, visit: http://dcapswoz.ict.usc.edu/
 
 <details>
 <summary> Setup (click to expand)</summary>
