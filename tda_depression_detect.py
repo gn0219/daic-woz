@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import librosa
+import pickle  # Add pickle for saving/loading diagrams
 
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import LabelEncoder
@@ -15,6 +16,7 @@ from numpy.lib.stride_tricks import sliding_window_view
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
+from tqdm import tqdm
 
 # import tensorflow as tf
 # from tensorflow.keras import layers, models
@@ -23,13 +25,13 @@ from sklearn.metrics import classification_report, accuracy_score
 # Step 1: Process all audio files and create train/test point clouds
 # ========================================================================= #
 
-df_splits = pd.read_csv('./df.csv')
+df_splits = pd.read_csv('./data/df.csv')
 
 def get_all_audio_files():
     audio_files = []
     
     # Check audio directory
-    audio_dir = './audio'
+    audio_dir = './wav_files'
     if os.path.exists(audio_dir):
         for f in os.listdir(audio_dir):
             if f.endswith('.wav'):
@@ -51,10 +53,10 @@ def extract_participant_id(filename):
 all_audio_files = get_all_audio_files()
 print(f"Found {len(all_audio_files)} audio files")
 
-# Process each audio file
-point_clouds = {}
-labels = {}
-participant_splits = {}
+    # Process each audio file
+    point_clouds = {}
+    labels = {}
+    participant_splits = {}
 
 def load_audio(audio_file, sr_target=16000, max_duration=None):    
     if max_duration is None:
@@ -108,8 +110,12 @@ for i, audio_file in enumerate(all_audio_files):
         print(f"Error processing {audio_file}: {e}")
         continue
 
-print(f"\nSuccessfully processed {len(point_clouds)} audio files")
+    print(f"\nSuccessfully processed {len(point_clouds)} audio files")
+    save_point_clouds(point_clouds, labels, participant_splits)
+else:
+    print("Loaded existing point clouds from files.")
 
+# Split data into train/test/dev sets
 train_point_clouds = {}
 test_point_clouds = {}
 dev_point_clouds = {}
@@ -140,23 +146,54 @@ print(f"Dev set: {len(dev_point_clouds)} samples")
 # Step 2: Compute Persistence Diagrams for Train/Test Point Clouds
 # ========================================================================= #
 
+def save_persistence_diagrams(diagrams_0d, diagrams_1d, split_name):
+    """Save persistence diagrams to files"""
+    os.makedirs('data/tda_features', exist_ok=True)
+    with open(f'data/tda_features/{split_name}_diagrams_0d.pkl', 'wb') as f:
+        pickle.dump(diagrams_0d, f)
+    with open(f'data/tda_features/{split_name}_diagrams_1d.pkl', 'wb') as f:
+        pickle.dump(diagrams_1d, f)
+
+def load_persistence_diagrams(split_name):
+    """Load persistence diagrams from files"""
+    try:
+        with open(f'data/tda_features/{split_name}_diagrams_0d.pkl', 'rb') as f:
+            diagrams_0d = pickle.load(f)
+        with open(f'data/tda_features/{split_name}_diagrams_1d.pkl', 'rb') as f:
+            diagrams_1d = pickle.load(f)
+        return diagrams_0d, diagrams_1d
+    except FileNotFoundError:
+        return None, None
+
 def compute_persistence_diagrams(point_clouds_dict):
     diagrams_0d = []
     diagrams_1d = []
-    for participant_id, pc in point_clouds_dict.items():
+    for participant_id, pc in tqdm(point_clouds_dict.items()):
         result = ripser(np.array(pc), maxdim=1)
         dgms = result['dgms']
         diagrams_0d.append(dgms[0])
         diagrams_1d.append(dgms[1])
     return diagrams_0d, diagrams_1d
 
-print("\nComputing persistence diagrams for train set...")
-train_diagrams_0d, train_diagrams_1d = compute_persistence_diagrams(train_point_clouds)
-print(f"Computed {len(train_diagrams_0d)} train 0D diagrams and {len(train_diagrams_1d)} train 1D diagrams.")
+print("\nChecking for existing persistence diagrams...")
+train_diagrams_0d, train_diagrams_1d = load_persistence_diagrams('train')
+test_diagrams_0d, test_diagrams_1d = load_persistence_diagrams('test')
 
-print("\nComputing persistence diagrams for test set...")
-test_diagrams_0d, test_diagrams_1d = compute_persistence_diagrams(test_point_clouds)
-print(f"Computed {len(test_diagrams_0d)} test 0D diagrams and {len(test_diagrams_1d)} test 1D diagrams.")
+if train_diagrams_0d is None or test_diagrams_0d is None:
+    print("Computing persistence diagrams...")
+    if train_diagrams_0d is None:
+        print("Computing train set diagrams...")
+        train_diagrams_0d, train_diagrams_1d = compute_persistence_diagrams(train_point_clouds)
+        save_persistence_diagrams(train_diagrams_0d, train_diagrams_1d, 'train')
+        print(f"Computed and saved {len(train_diagrams_0d)} train 0D diagrams and {len(train_diagrams_1d)} train 1D diagrams.")
+    
+    if test_diagrams_0d is None:
+        print("Computing test set diagrams...")
+        test_diagrams_0d, test_diagrams_1d = compute_persistence_diagrams(test_point_clouds)
+        save_persistence_diagrams(test_diagrams_0d, test_diagrams_1d, 'test')
+        print(f"Computed and saved {len(test_diagrams_0d)} test 0D diagrams and {len(test_diagrams_1d)} test 1D diagrams.")
+else:
+    print("Loaded existing persistence diagrams from files.")
 
 # Normalize persistence diagrams per diagram (births and deaths to [0, 1])
 def normalize_diagrams_per_diagram(diagrams):
