@@ -7,8 +7,8 @@ Batch Size: 32
 Learning Rate: 0.001
 
 Results:
-Accuracy: 0.5172
-F1 Score (Macro): 0.4658
-AUROC: 0.4722
-Precision: 0.2727
-Recall: 0.3333
+Accuracy: 0.6897
+F1 Score (Macro): 0.4082
+AUROC: 0.4861
+Precision: 0.0000
+Recall: 0.0000

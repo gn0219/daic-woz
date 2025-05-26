@@ -15,8 +15,9 @@ from persim import PersistenceImager
 from numpy.lib.stride_tricks import sliding_window_view
 
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, accuracy_score
+from sklearn.metrics import classification_report, accuracy_score, roc_auc_score, f1_score, confusion_matrix
 from tqdm import tqdm
+import seaborn as sns
 
 # import tensorflow as tf
 # from tensorflow.keras import layers, models
@@ -53,10 +54,10 @@ def extract_participant_id(filename):
 all_audio_files = get_all_audio_files()
 print(f"Found {len(all_audio_files)} audio files")
 
-    # Process each audio file
-    point_clouds = {}
-    labels = {}
-    participant_splits = {}
+# Process each audio file
+point_clouds = {}
+labels = {}
+participant_splits = {}
 
 def load_audio(audio_file, sr_target=16000, max_duration=None):    
     if max_duration is None:
@@ -110,12 +111,8 @@ for i, audio_file in enumerate(all_audio_files):
         print(f"Error processing {audio_file}: {e}")
         continue
 
-    print(f"\nSuccessfully processed {len(point_clouds)} audio files")
-    save_point_clouds(point_clouds, labels, participant_splits)
-else:
-    print("Loaded existing point clouds from files.")
+print(f"\nSuccessfully processed {len(point_clouds)} audio files")
 
-# Split data into train/test/dev sets
 train_point_clouds = {}
 test_point_clouds = {}
 dev_point_clouds = {}
@@ -281,10 +278,24 @@ clf = RandomForestClassifier(n_estimators=100, random_state=42)
 clf.fit(X_train, y_train)
 
 y_pred = clf.predict(X_test)
+y_pred_proba = clf.predict_proba(X_test)[:, 1]  # Get probability scores for positive class
 
 print("\nRandom Forest Classification Results (1D Persistence Images):")
 print(classification_report(y_test, y_pred))
 print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
+print(f"AUROC: {roc_auc_score(y_test, y_pred_proba):.4f}")
+print(f"F1-macro: {f1_score(y_test, y_pred, average='macro'):.4f}")
+
+# Plot confusion matrix
+plt.figure(figsize=(8, 6))
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+            xticklabels=['Non-depressed', 'Depressed'],
+            yticklabels=['Non-depressed', 'Depressed'])
+plt.title('Confusion Matrix')
+plt.ylabel('True Label')
+plt.xlabel('Predicted Label')
+plt.show()
 
 # %%
 # ========================================================================= #
