@@ -157,20 +157,20 @@ This process produces three feature files: `info_df.csv`, `utterance_features.cs
 
 ## Approach 1: LSTM (`5-1.run_lstm.py`)
 - Implements an LSTM model on extracted feature sequences (utterance-related + opensmile)
-- Results saved in: [results/lstm_results/*](results/lstm_results/)
+- Results saved in: [results/lstm_result/*](results/lstm_result/)
 
 ## Approach 2: Multimodal learning (`5-2.run_multimodal.py`)
 - Applies two **separate DNN encoders** to:
   - Utterance-related features (37 dims)
   - Audio features extracted via openSMILE (88 dims)
 - Combines both modalities for classification
-- Results saved in: [results/multimodal_results/*](results/multimodal_results/)
+- Results saved in: [results/multimodal_result/*](results/multimodal_result/)
 
 ## Approach 3: Multitask learning (`5-3.run_multitask_learning.py`)
 - Use `gender` as an **auxilary task** to support the main classification task
 - Applies **different loss weights** when calculating multitask loss (main task : auxiliary task = 1 : 0.3)
 - Compares multitask vs. single-task performance on Accuracy, F1, and AUROC
-- Results saved in: [results/multitask/*](results/multitask/)
+- Results saved in: [results/multitask_result/*](results/multitask_result/)
 
 ## Approach 4: Topological Data Analysis (`5-4.tda_depression_detect.py`)
 - Applies **persistent homology** to convert audio into topological representations
