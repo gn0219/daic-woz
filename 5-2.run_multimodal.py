@@ -106,34 +106,53 @@ class MultimodalDataset(Dataset):
         return self.utterance_features[idx], self.audio_features[idx], self.labels[idx]
 
 class MultimodalModel(nn.Module):
-    def __init__(self, utterance_input_size, audio_input_size, hidden_size, dropout=0.3):
+    def __init__(self, utterance_input_size, audio_input_size, hidden_size, dropout=0.4):
         super(MultimodalModel, self).__init__()
         
-        # Utterance modality
+        # Utterance modality encoder with deeper structure
         self.utterance_encoder = nn.Sequential(
-            nn.Linear(utterance_input_size, hidden_size),
-            nn.BatchNorm1d(hidden_size),
-            nn.ReLU(),
-            nn.Dropout(dropout)
-        )
-        
-        # Audio modality
-        self.audio_encoder = nn.Sequential(
-            nn.Linear(audio_input_size, hidden_size),
-            nn.BatchNorm1d(hidden_size),
-            nn.ReLU(),
-            nn.Dropout(dropout)
-        )
-        
-        
-        # Fusion layer
-        fusion_input_size = hidden_size * 2
-        self.fusion_layer = nn.Sequential(
-            nn.Linear(fusion_input_size, hidden_size),
-            nn.BatchNorm1d(hidden_size),
+            nn.Linear(utterance_input_size, 512),
+            nn.BatchNorm1d(512),
             nn.ReLU(),
             nn.Dropout(dropout),
-            nn.Linear(hidden_size, 1)
+            nn.Linear(512, 256),
+            nn.BatchNorm1d(256),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(256, 128),
+            nn.BatchNorm1d(128),
+            nn.ReLU(),
+            nn.Dropout(dropout)
+        )
+        
+        # Audio modality encoder with deeper structure
+        self.audio_encoder = nn.Sequential(
+            nn.Linear(audio_input_size, 512),
+            nn.BatchNorm1d(512),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(512, 256),
+            nn.BatchNorm1d(256),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(256, 128),
+            nn.BatchNorm1d(128),
+            nn.ReLU(),
+            nn.Dropout(dropout)
+        )
+        
+        # Fusion layer with deeper structure
+        fusion_input_size = 128 * 2  # 128 from each encoder
+        self.fusion_layer = nn.Sequential(
+            nn.Linear(fusion_input_size, 256),
+            nn.BatchNorm1d(256),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(256, 64),
+            nn.BatchNorm1d(64),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(64, 1)
         )
         
     def forward(self, utterance_x, audio_x):

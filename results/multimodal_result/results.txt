@@ -9,7 +9,7 @@ Patience: 20
 
 Results:
 Accuracy: 0.6957
-F1 Score (Macro): 0.5818
-AUROC: 0.6384
+F1 Score (Macro): 0.6054
+AUROC: 0.5424
 Precision: 0.5000
-Recall: 0.2857
+Recall: 0.3571
