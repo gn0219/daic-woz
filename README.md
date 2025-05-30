@@ -130,7 +130,7 @@ This process produces three feature files: `info_df.csv`, `utterance_features.cs
   - [`src/visualize_audio.py`](./src/visualize_audio.py): waveform and log-spectrogram visualizations
 
 ## 2. evaluate_basic_models.ipynb
-<img src = "etc/ml_overview.png">
+<img src = "etc/figures/ml_overview.png">
 
 - Implements basic ML model evaluation using only the `train`/`test` splits (excluding `dev`)
 - Evaluates 7 models: Baseline (Majority voting), SVM, KNN, Random Forest, Logistic Regression, Gradient Boosting, XGBoost
@@ -143,7 +143,7 @@ This process produces three feature files: `info_df.csv`, `utterance_features.cs
 
 ## 3. topological_features.ipynb
 <div align="center">
-<img src = "etc/tda_sample.png" width=40%>
+<img src = "etc/figures/tda_sample.png" width=40%>
 </div>
 
 - Initial visualization of topological features from audio-derived point clouds
@@ -160,6 +160,11 @@ This process produces three feature files: `info_df.csv`, `utterance_features.cs
 - Results saved in: [results/lstm_result/*](results/lstm_result/)
 
 ## Approach 2: Multimodal learning (`5-2.run_multimodal.py`)
+
+<div align="center">
+<img src = "etc/figures/multimodal.png" width=80%>
+</div>
+
 - Applies two **separate DNN encoders** to:
   - Utterance-related features (37 dims)
   - Audio features extracted via openSMILE (88 dims)
@@ -167,6 +172,11 @@ This process produces three feature files: `info_df.csv`, `utterance_features.cs
 - Results saved in: [results/multimodal_result/*](results/multimodal_result/)
 
 ## Approach 3: Multitask learning (`5-3.run_multitask_learning.py`)
+
+<div align="center">
+<img src = "etc/figures/multitask_annot.png" width=80%>
+</div>
+
 - Use `gender` as an **auxilary task** to support the main classification task
 - Applies **different loss weights** when calculating multitask loss (main task : auxiliary task = 1 : 0.3)
 - Compares multitask vs. single-task performance on Accuracy, F1, and AUROC
