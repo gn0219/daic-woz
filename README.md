@@ -125,7 +125,7 @@ daic-woz/
 |                    | Random Forest w/ eGeMAPS + Utterance features   | 0.7021   | 0.4727   | 0.5963 |
 |                    | Logistic Regression w/ eGeMAPS + Utterance features | 0.6383   | 0.5761   | 0.5888 |
 |                    | Gradient Boosting w/ eGeMAPS + Utterance features | 0.6596   | 0.4502   | 0.6407 |
-|                    | **XGBoost w/ eGeMAPS + Utterance features  **        | **0.7660**   | *0.6628*   | **0.7446** |
+|                    | **XGBoost w/ eGeMAPS + Utterance features**        | **0.7660**   | *0.6628*   | **0.7446** |
 | **Advanced Analysis (DL, TDA)** | MLP w/ eGeMAPS + Utterance features           | 0.6596   | 0.6210   | *0.6602* |
 |                    | LSTM w/ eGeMAPS + Utterance features             | 0.6522   | 0.5893   | 0.6250 |
 |                    | Fusion based DNN w/ eGeMAPS + Utterance features | 0.6957   | 0.6054   | 0.5424 |
