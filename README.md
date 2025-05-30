@@ -116,7 +116,24 @@ daic-woz/
 ```
 </details>
 
-# Analysis
+# 📑 Performance summary
+
+| Phase               | Method                                             | Accuracy | F1 Score | AUROC |
+|--------------------|----------------------------------------------------|----------|----------|--------|
+| **Initial Analysis (ML)** | SVM w/ eGeMAPS + Utterance features              | 0.6596   | 0.6210   | 0.5909 |
+|                    | KNN w/ eGeMAPS + Utterance features              | *0.7447*   | 0.5877   | 0.5595 |
+|                    | Random Forest w/ eGeMAPS + Utterance features   | 0.7021   | 0.4727   | 0.5963 |
+|                    | Logistic Regression w/ eGeMAPS + Utterance features | 0.6383   | 0.5761   | 0.5888 |
+|                    | Gradient Boosting w/ eGeMAPS + Utterance features | 0.6596   | 0.4502   | 0.6407 |
+|                    | XGBoost w/ eGeMAPS + Utterance features          | **0.7660**   | *0.6628*   | **0.7446** |
+| **Advanced Analysis (DL, TDA)** | MLP w/ eGeMAPS + Utterance features           | 0.6596   | 0.6210   | *0.6602* |
+|                    | LSTM w/ eGeMAPS + Utterance features             | 0.6522   | 0.5893   | 0.6250 |
+|                    | Fusion based DNN w/ eGeMAPS + Utterance features | 0.6957   | 0.6054   | 0.5424 |
+|                    | Multitask Learning w/ eGeMAPS + Utterance features | *0.7447*   | **0.6810**   | 0.6385 |
+|                    | Random Forest w/ Topological features            | 0.5745   | 0.4340   | 0.4066 |
+
+
+# 📈 Analysis
 ## 0. extract_features.ipynb
 This process produces three feature files: `info_df.csv`, `utterance_features.csv`, and `smile_features.csv`.
 - Extract utterance-related features from transcription files
@@ -189,6 +206,7 @@ This process produces three feature files: `info_df.csv`, `utterance_features.cs
   - Trains a **Random Forest** classifier on flattened images
   - Evaluated using Accuracy, AUROC, F1, and Confusion Matrix
 - Results saved in: [result/tda_result/*](results/tda_result/)
+
 
 # Project folder structure (after Analysis)
 
